@@ -35,6 +35,9 @@ Route::post('agendar', [menucontroller::class, 'store'])->name('agendar.store');
 //---------RUTAS PARA REPORTAR INGRESOS
 Route::post('reportaringresos/generar', [menucontroller::class, 'generarReporte'])->name('generarReporte');
 
+//---------Rutas reporte de eventos
+Route::post('/generarReporteEventos', [menucontroller::class, 'generarReporteEventos'])->name('generarReporteEventos');
+Route::get('reporte-eventos',[menucontroller::class,'reporte-eventos'])->name('reporte-eventos');
 
 
 Route::get('inicio',[menucontroller::class,'inicio'])->name('inicio');

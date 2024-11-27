@@ -18,7 +18,8 @@ use App\Models\productosservicios;
 use App\Models\provedoes;
 use App\Models\tipospagos;
 
-use Session; 
+use Session;
+use Carbon\Carbon;
 
 
 class menucontroller extends Controller
@@ -244,6 +245,34 @@ class menucontroller extends Controller
         return view('reportareventos');
     }
 
+    public function generarReporteEventos(Request $request)
+    {
+        // Validar que el mes esté en formato correcto
+        $this->validate($request, [
+            'mes' => 'required|date_format:Y-m',
+        ]);
+
+        $mes = $request->input('mes'); // Obtener el mes del formulario (formato YYYY-MM)
+
+        // Consultar los eventos que coincidan con el mes
+        $reportes = \DB::select("SELECT 
+                c.idCoEvent, co.fechaEvent, c.fechaContra, e.nombre AS tipoDeEvento, co.costo
+            FROM contratosevent AS c
+            INNER JOIN cotizareventos AS co ON co.idCoEvent = c.idCoEvent
+            INNER JOIN eventos AS e ON e.idCatEvent = co.idCatEvent
+            WHERE co.fechaEvent LIKE ?", ["$mes%"]);
+
+        // Si no hay eventos, mostrar mensaje en la vista
+        if (empty($reportes)) {
+            return view('reporte-eventos', [
+                'reportes' => [],
+                'mes' => $mes,
+            ])->withErrors(['mensaje' => 'No hay eventos registrados para este mes.']);
+        }
+
+        // Si hay eventos, enviarlos a la vista
+        return view('reporte-eventos', compact('reportes', 'mes'));
+    }
 
     public function altamenu()
         {
